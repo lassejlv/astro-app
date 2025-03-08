@@ -3,7 +3,7 @@
     "builder": "RAILPACK"
   },
   "deploy": {
-    "startCommand": "bun --bun ./dist/server/entry.mjs",
+    "startCommand": "node ./dist/server/entry.mjs",
     "sleepApplication": true
   }
 }
