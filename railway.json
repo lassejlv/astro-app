@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "RAILPACK"
+  },
+  "deploy": {
+    "startCommand": "node ./dist/server/entry.mjs",
+    "sleepApplication": true
+  }
+}
