@@ -1,0 +1,9 @@
+---
+import Layout from "@/layouts/Layout.astro"
+
+const { user } = Astro.locals;
+---
+
+<Layout>
+  Hello {user.email}!
+</Layout>

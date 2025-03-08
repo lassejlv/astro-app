@@ -1,7 +1,9 @@
 ---
 import Layout from "@/layouts/Layout.astro"
+import { auth } from "@/lib/auth"
 
-console.log("Hello this is on the server!§");
+const session = await auth.api.getSession({ headers: Astro.request.headers })
+if (session) return Astro.redirect("/app")
 
 ---
 
