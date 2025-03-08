@@ -1,7 +1,7 @@
 {
   "build": {
     "builder": "RAILPACK",
-    "buildCommand": "bun --bun run build && bunx prisma generate && bunx prisma migrate deploy"
+    "buildCommand": "bun --bun run build && bunx prisma generate"
   },
   "deploy": {
     "startCommand": "bun --bun ./dist/server/entry.mjs",
