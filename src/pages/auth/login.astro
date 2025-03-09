@@ -1,0 +1,75 @@
+---
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import Layout from "@/layouts/Layout.astro"
+import { auth } from "@/lib/auth"
+import { z } from "astro:schema"
+
+const err = Astro.url.searchParams.get("error")
+const state = Astro.url.searchParams.get("state")
+const message = Astro.url.searchParams.get("message")
+const emailFromQuery = Astro.url.searchParams.get("email")
+
+
+const schema = z.object({
+  email: z.string().email(),
+  state: z.string()
+})
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData()
+  const email = data.get("email") as string
+  const state = data.get("state") as string
+  const code = data.get("code") as string
+
+  console.log(code);
+
+  try {
+
+    if (state === "validate_code" && emailFromQuery) {
+      await auth.api.verifyEmailOTP({
+        body: {
+          email: emailFromQuery,
+          otp: code
+        }
+      })
+      return Astro.redirect("/app")
+    } else if (state === "send_code") {
+      schema.parse({ email, state })
+      await auth.api.sendVerificationOTP({
+      body: {
+        email,
+        type: "sign-in"
+      }
+    })
+    return Astro.redirect(`/auth/login?state=otp_provide_code&email=${email}&message=${encodeURIComponent("Check your email for an email verification code!")}`)    
+    }
+  } catch (error) {
+    console.error(error)
+    return Astro.redirect(`/auth/login?error=${error.message}`)
+  }
+}
+---
+
+<Layout>
+  <form action="/auth/login" method="POST">
+   {state === "otp_provide_code" ? (
+      <div class="flex gap-2">
+        <Input type="text" name="code" placeholder="Enter your verification code"/>
+        <Input type="hidden" name="state" value={"validate_code"} />
+        <Button type="submit">Validate</Button>
+      </div>
+    ) : (
+      <div>
+        <h1>Login to your account</h1>
+        <Input type="email" placeholder="Email" name="email" />
+        <Input type="hidden" name="state" value={"send_code"} />
+        <Button type="submit">Login</Button>
+      </div>
+    )}
+
+    {message && <p class="text-green-500">{message}</p>}
+
+    {err && <p class="text-red-500">{err}</p>}
+  </form>
+</Layout>

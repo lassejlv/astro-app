@@ -11,6 +11,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (!session) return context.redirect('/auth/login')
 
+  if (pathname.includes('auth') && session) return context.redirect('/app')
+
   context.locals.session = session.session
   context.locals.user = session.user
 

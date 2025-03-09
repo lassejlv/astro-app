@@ -5,6 +5,8 @@ import Layout from "@/layouts/Layout.astro"
 import { auth } from "@/lib/auth"
 import { z } from "astro:schema"
 
+const err = Astro.url.searchParams.get("error")
+
 
 const schema = z.object({
   name: z.string().min(2).max(50),
@@ -21,8 +23,10 @@ if (Astro.request.method === "POST") {
   try {
     schema.parse({ name, email, password })
     await auth.api.signUpEmail({ body: { name, email, password } })
+    return Astro.redirect(`/auth/login?message=${encodeURIComponent("Check your email for an email verification link!")}`)
   } catch (error) {
     console.error(error)
+    return Astro.redirect(`/auth/register?error=${error.message}`)
   }
 }
 ---
@@ -34,5 +38,7 @@ if (Astro.request.method === "POST") {
     <Input type="email" placeholder="Email" name="email" />
     <Input type="password" placeholder="Password" name="password" />
     <Button type="submit">Register</Button>
+
+    {err && <p class="text-red-500">{err}</p>}
   </form>
 </Layout>
